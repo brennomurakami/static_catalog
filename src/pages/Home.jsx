@@ -4,99 +4,12 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { motion } from 'framer-motion';
 import { featuredProducts } from '../data/products';
+import ProductCard from '../components/ProductCard';
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-
-const ProductCard = ({ product }) => {
-  const theme = useTheme();
-  const navigate = useNavigate();
-
-  return (
-    <motion.div
-      whileHover={{ y: -10 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => navigate(`/product/${product.id}`)}
-      style={{ cursor: 'pointer' }}
-    >
-      <Box
-        sx={{
-          borderRadius: 2,
-          overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          bgcolor: 'background.paper',
-          transition: 'all 0.3s ease',
-          border: '1px solid rgba(212, 179, 107, 0.1)',
-          '&:hover': {
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-            border: `1px solid ${theme.palette.secondary.main}`,
-          },
-        }}
-      >
-        <Box
-          sx={{
-            height: 300,
-            width: '100%',
-            backgroundImage: `url(${product.images[0]})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            position: 'relative',
-            '&:before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%)',
-              opacity: 0,
-              transition: 'opacity 0.3s ease',
-            },
-            '&:hover:before': {
-              opacity: 1,
-            },
-          }}
-        />
-        <Box sx={{ p: 3 }}>
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{
-              fontWeight: 600,
-              color: theme.palette.primary.main,
-            }}
-          >
-            {product.name}
-          </Typography>
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{ mb: 2, minHeight: '48px' }}
-          >
-            {product.description.slice(0, 80)}...
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              color: theme.palette.secondary.main,
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            <Box component="span" sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>
-              R$
-            </Box>
-            {product.price.toFixed(2)}
-          </Typography>
-        </Box>
-      </Box>
-    </motion.div>
-  );
-};
 
 const Home = () => {
   const theme = useTheme();
@@ -208,7 +121,7 @@ const Home = () => {
 
         <Grid container spacing={4}>
           {featuredProducts.map((product) => (
-            <Grid item key={product.id} xs={12} sm={6} md={4}>
+           <Grid key={product.id} xs={12} sm={6} md={4}>
               <ProductCard product={product} />
             </Grid>
           ))}

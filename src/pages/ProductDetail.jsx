@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { getProductById } from '../data/products';
+import AddToCartButton from '../components/AddToCartButton';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -58,7 +59,7 @@ const ProductDetail = () => {
 
       <Grid container spacing={4} alignItems="flex-start">
         {/* Coluna da esquerda - Carrossel */}
-        <Grid item xs={12} md={5}>
+        <Grid xs={12} md={5}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -81,7 +82,7 @@ const ProductDetail = () => {
                   clickable: true,
                 }}
                 modules={[Navigation, Pagination, Thumbs]}
-                style={{ 
+                style={{
                   aspectRatio: '1',
                 }}
               >
@@ -145,7 +146,7 @@ const ProductDetail = () => {
         </Grid>
 
         {/* Coluna da direita - Informações */}
-        <Grid item xs={12} md={7}>
+        <Grid xs={12} md={7}>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -182,6 +183,10 @@ const ProductDetail = () => {
                 {product.price.toFixed(2)}
               </Typography>
 
+              <Box sx={{ mb: 2 }}>
+                <AddToCartButton product={product} fullWidth />
+              </Box>
+
               <Typography
                 variant="body1"
                 sx={{
@@ -193,6 +198,7 @@ const ProductDetail = () => {
               >
                 {product.description}
               </Typography>
+
 
               <Box
                 sx={{
@@ -230,7 +236,7 @@ const ProductDetail = () => {
                     boxShadow: '0 6px 16px rgba(212, 179, 107, 0.4)',
                   },
                 }}
-                onClick={() => window.open('https://wa.me/5511999999999?text=' + encodeURIComponent(`Olá, tenho interesse no produto ${product.name} (Código: ${product.id})`), '_blank')}
+                onClick={() => window.open('https://wa.me/5521997741525?text=' + encodeURIComponent(`Olá, tenho interesse no produto ${product.name} (Código: ${product.id})`), '_blank')}
               >
                 Entrar em Contato
               </Button>

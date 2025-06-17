@@ -12,9 +12,16 @@ import {
   MenuItem,
   useTheme,
   useMediaQuery,
+  Badge,
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { motion } from 'framer-motion';
+import { useCart } from '../contexts/CartContext';   // ?? novo
 import logo from '../assets/logo.png';
 
 const categories = [
@@ -27,19 +34,19 @@ const categories = [
   'Outros',
 ];
 
-const Header = () => {
+export default function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
+  const { items, total } = useCart();                // ?? novo
 
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  /* ---------- pop-over do carrinho ---------- */
+  const [anchorCart, setAnchorCart] = useState(null);
+  const openCart = Boolean(anchorCart);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleMenu = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   const handleCategoryClick = (category) => {
     navigate(`/category/${category.toLowerCase()}`);
@@ -47,8 +54,8 @@ const Header = () => {
   };
 
   return (
-    <AppBar 
-      position="sticky" 
+    <AppBar
+      position="sticky"
       elevation={0}
       sx={{
         background: 'linear-gradient(45deg, #000000 30%, #1a1a1a 90%)',
@@ -57,14 +64,15 @@ const Header = () => {
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ py: 1 }}>
+          {/* ---- LOGO ---- */}
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            style={{ 
-              cursor: 'pointer', 
-              display: 'flex', 
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
               alignItems: 'center',
-              gap: '16px'
+              gap: '16px',
             }}
             onClick={() => navigate('/')}
           >
@@ -89,17 +97,19 @@ const Header = () => {
                 letterSpacing: '0.1em',
                 display: { xs: 'none', sm: 'flex' },
                 alignItems: 'center',
-                '& span': {
-                  color: '#fff',
-                },
+                '& span': { color: '#fff' },
               }}
             >
               <Box component="span">ALL</Box>&nbsp;
-              <Box component="span" sx={{ color: theme.palette.secondary.main }}>STAR</Box>&nbsp;
+              <Box component="span" sx={{ color: theme.palette.secondary.main }}>
+                STAR
+              </Box>
+              &nbsp;
               <Box component="span">IMPORTS</Box>
             </Typography>
           </motion.div>
 
+          {/* ---- LINKS / MENU ---- */}
           {isMobile ? (
             <>
               <IconButton
@@ -124,36 +134,27 @@ const Header = () => {
                     mt: 1.5,
                     bgcolor: '#000',
                     color: '#fff',
-                    '& .MuiMenuItem-root': {
-                      '&:hover': {
-                        bgcolor: 'rgba(212, 179, 107, 0.1)',
-                        color: theme.palette.secondary.main,
-                      },
+                    '& .MuiMenuItem-root:hover': {
+                      bgcolor: 'rgba(212, 179, 107, 0.1)',
+                      color: theme.palette.secondary.main,
                     },
                   },
                 }}
               >
-                {categories.map((category) => (
-                  <MenuItem
-                    key={category}
-                    onClick={() => handleCategoryClick(category)}
-                  >
-                    {category}
+                {categories.map((cat) => (
+                  <MenuItem key={cat} onClick={() => handleCategoryClick(cat)}>
+                    {cat}
                   </MenuItem>
                 ))}
               </Menu>
             </>
           ) : (
             <Box sx={{ display: 'flex', gap: 3, ml: 'auto' }}>
-              {categories.map((category) => (
-                <motion.div
-                  key={category}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+              {categories.map((cat) => (
+                <motion.div key={cat} whileHover={{ y: -2 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     color="inherit"
-                    onClick={() => handleCategoryClick(category)}
+                    onClick={() => handleCategoryClick(cat)}
                     sx={{
                       fontSize: '0.9rem',
                       fontWeight: 500,
@@ -172,22 +173,66 @@ const Header = () => {
                       '&:hover': {
                         color: theme.palette.secondary.main,
                         backgroundColor: 'transparent',
-                        '&:after': {
-                          width: '80%',
-                        },
+                        '&:after': { width: '80%' },
                       },
                     }}
                   >
-                    {category}
+                    {cat}
                   </Button>
                 </motion.div>
               ))}
             </Box>
           )}
+
+          {/* ---- ÍCONE DO CARRINHO ---- */}
+          <IconButton
+            color="inherit"
+            sx={{ ml: 2 }}
+            onClick={() => navigate('/cart')}
+            onMouseEnter={(e) => setAnchorCart(e.currentTarget)}
+            onMouseLeave={() => setAnchorCart(null)}
+          >
+            <Badge badgeContent={items.length} color="secondary">
+              <ShoppingCartIcon />
+            </Badge>
+          </IconButton>
+
+          {/* Pop-over com itens */}
+          <Popover
+            open={openCart}
+            anchorEl={anchorCart}
+            onClose={() => setAnchorCart(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            disableRestoreFocus
+            sx={{ pointerEvents: 'none' }}
+          >
+            <List sx={{ width: 250 }}>
+              {items.length === 0 && (
+                <ListItem>
+                  <ListItemText primary="Carrinho vazio" />
+                </ListItem>
+              )}
+              {items.map((it) => (
+                <ListItem key={it.id}>
+                  <ListItemText
+                    primary={`${it.nome} x${it.quantidade}`}
+                    secondary={`R$ ${(it.preco * it.quantidade).toFixed(2)}`}
+                  />
+                </ListItem>
+              ))}
+              {items.length > 0 && (
+                <ListItem>
+                  <ListItemText
+                    primary="Subtotal"
+                    secondary={`R$ ${total.toFixed(2)}`}
+                  />
+                </ListItem>
+              )}
+            </List>
+          </Popover>
         </Toolbar>
       </Container>
     </AppBar>
   );
-};
-
-export default Header; 
+}
